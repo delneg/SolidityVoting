@@ -2,21 +2,8 @@
     <div id="app">
         <div v-if="hasWeb3">
             <h1>Голосование за президента</h1>
-            <ul>
-                <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-                <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-                <li><a href="https://gitter.im/vuejs/vue" target="_blank">Gitter Chat</a></li>
-                <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-            </ul>
-            <h2>Ecosystem</h2>
-            <ul>
-                <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-                <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-                <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-                <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-            </ul>
-             <div id="people">
-                <v-client-table :data="tableData" :columns="columns" :options="{filterable:false}"></v-client-table>
+            <div id="people">
+                <v-client-table :data="proposals" :columns="columns" :options="{filterable:false}"></v-client-table>
             </div>
         </div>
         <div v-else>
@@ -27,6 +14,15 @@
 </template>
 
 <script>
+    function hex2a(hexx) {
+        let hex = hexx.toString();
+        let str = '';
+        for (let i = 0; i < hex.length; i += 2)
+            str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+        return str.replace(/\u0000/g,'');
+    }
+    const ABI = [{"constant":false,"inputs":[{"name":"proposal","type":"uint256"}],"name":"vote","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"proposals","outputs":[{"name":"name","type":"bytes32"},{"name":"voteCount","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"chairperson","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"}],"name":"delegate","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"winningProposal","outputs":[{"name":"winningProposal","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"voters","outputs":[{"name":"weight","type":"uint256"},{"name":"voted","type":"bool"},{"name":"delegate","type":"address"},{"name":"vote","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"winnerName","outputs":[{"name":"winnerName","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"giveRightToVote","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"proposalNames","type":"bytes32[]"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"}];
+    const CONTRACT_ADDRESS = '0x7ea490ebb55a2e006e0bb1150414b48ecb971f31';
     export default {
         name: 'app',
         mounted() {
@@ -35,6 +31,18 @@
             if (typeof web3 !== 'undefined') {
                 // You have a web3 browser! Continue below!
                 this.hasWeb3 = true;
+                let contract = web3.eth.contract(ABI);
+                window.contract_i = contract.at(CONTRACT_ADDRESS);
+                let that = this;
+                for (let i = 0; i < 3; i++) {
+                    window.contract_i.proposals(i, function (_, proposal) {
+                        that.proposals.push({
+                            name:hex2a(proposal[0]),
+                            count:proposal[1].c[0]
+                        })
+                    });
+                }
+
             } else {
                 // Warn the user that they need to get a web3 browser
                 // Or install MetaMask, maybe with a nice graphic.
@@ -46,11 +54,9 @@
             return {
                 msg: 'Welcome to Your Vue.js App',
                 columns: ['name', 'count'],
-                tableData: [
-                    {name: "John", count: "20"},
-                ],
                 proposals: [],
                 hasWeb3: false,
+                contract: null,
             }
         },
         computed: {},
