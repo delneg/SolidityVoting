@@ -5,9 +5,14 @@
             <div id="people">
                 <v-client-table :data="proposals" :columns="columns" :options="{filterable:false}"></v-client-table>
             </div>
+            <h2 v-if="voted">Вы уже голосовали</h2>
+            <div v-else>
+                <h2>Проголосовать</h2>
+            </div>
         </div>
         <div v-else>
             <h1>Установите Metamask для участия в голосовании</h1>
+            <a href="https://chrome.google.com/webstore/detail/nkbihfbeogaeaoehlefnkodbefgpgknn" class="cta small" target="_blank">Metamask</a>
         </div>
 
     </div>
@@ -42,6 +47,7 @@
                         })
                     });
                 }
+                this.checkVoted();
 
             } else {
                 // Warn the user that they need to get a web3 browser
@@ -57,9 +63,17 @@
                 proposals: [],
                 hasWeb3: false,
                 contract: null,
+                voted: false
             }
         },
-        computed: {},
+        computed: {
+            checkVoted: function (){
+                let this_address = window.contract_i.eth.defaultAccount;
+                window.contract_i.voters(this_address, function (_, voter) {
+                    this.voted = voter[1];
+                });
+            }
+        },
         methods: {
             sayHello: function () {
                 console.log('hello, World!');
@@ -69,6 +83,9 @@
 </script>
 
 <style>
+    .VueTables__table{
+        margin-left: 47%;
+    }
     #app {
         font-family: 'Avenir', Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
