@@ -67,16 +67,17 @@
             }
         },
         computed: {
-            checkVoted: function (){
-                let this_address = window.contract_i.eth.defaultAccount;
-                window.contract_i.voters(this_address, function (_, voter) {
-                    this.voted = voter[1];
-                });
-            }
         },
         methods: {
             sayHello: function () {
                 console.log('hello, World!');
+            },
+            checkVoted: function (){
+                let this_address = web3.eth.defaultAccount;
+                let that = this;
+                window.contract_i.voters(this_address, function (_, voter) {
+                    that.voted = voter[1];
+                });
             }
         },
     }
