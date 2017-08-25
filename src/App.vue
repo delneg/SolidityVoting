@@ -17,6 +17,10 @@
             <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
         </ul>
         <button @click="sayHello()">Say hello</button>
+        <h1>Голосование</h1>
+        <div id="people">
+            <v-client-table :data="tableData" :columns="columns" :options="{filterable:false}"></v-client-table>
+        </div>
     </div>
 </template>
 
@@ -25,12 +29,16 @@
         name: 'app',
         data() {
             return {
-                msg: 'Welcome to Your Vue.js App'
+                msg: 'Welcome to Your Vue.js App',
+                columns: ['name', 'count'],
+                tableData: [
+                    {name: "John", count: "20"},
+                ],
             }
         },
         computed: {},
         methods: {
-            sayHello: function(){
+            sayHello: function () {
                 console.log('hello, World!');
             }
         },
