@@ -1,4 +1,4 @@
-<template>
+<template xmlns:v-on="http://www.w3.org/1999/xhtml">
     <div id="app">
         <div v-if="hasWeb3">
             <h1>Голосование за президента</h1>
@@ -8,6 +8,9 @@
             <h2 v-if="voted">Вы уже голосовали</h2>
             <div v-else>
                 <h2>Проголосовать</h2>
+                <button v-on:click="voteDenis">denis</button>
+                <button v-on:click="voteValera">valera</button>
+                <button v-on:click="voteOleg">oleg</button>
             </div>
         </div>
         <div v-else>
@@ -26,6 +29,19 @@
             str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
         return str.replace(/\u0000/g,'');
     }
+
+    function convertToHex(str) {
+        let hex, i;
+
+        let result = "";
+        for (i=0; i<str.length; i++) {
+            hex = str.charCodeAt(i).toString(16);
+            result += ("000"+hex).slice(-4);
+        }
+
+        return result
+    }
+
     const ABI = [{"constant":false,"inputs":[{"name":"proposal","type":"uint256"}],"name":"vote","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"proposals","outputs":[{"name":"name","type":"bytes32"},{"name":"voteCount","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"chairperson","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"}],"name":"delegate","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"winningProposal","outputs":[{"name":"winningProposal","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"voters","outputs":[{"name":"weight","type":"uint256"},{"name":"voted","type":"bool"},{"name":"delegate","type":"address"},{"name":"vote","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"winnerName","outputs":[{"name":"winnerName","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"giveRightToVote","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"proposalNames","type":"bytes32[]"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"}];
     const CONTRACT_ADDRESS = '0x7ea490ebb55a2e006e0bb1150414b48ecb971f31';
     export default {
@@ -78,7 +94,37 @@
                 window.contract_i.voters(this_address, function (_, voter) {
                     that.voted = voter[1];
                 });
-            }
+            },
+            voteDenis: function () {
+                window.contract_i.giveRightToVote(function(error, result){
+                    if (error)
+                        console.error(error);
+                });
+                window.contract_i.vote(convertToHex("denis"), function(error, result){
+                    if (error)
+                        console.error(error);
+                });
+            },
+            voteValera: function () {
+                window.contract_i.giveRightToVote(function(error, result){
+                    if (error)
+                        console.error(error);
+                });
+                window.contract_i.vote(convertToHex("valera"), function(error, result){
+                    if (error)
+                        console.error(error);
+                });
+            },
+            voteOleg: function () {
+                window.contract_i.giveRightToVote(function(error, result){
+                    if (error)
+                        console.error(error);
+                });
+                window.contract_i.vote(convertToHex("oleg"), function(error, result){
+                    if (error)
+                        console.error(error);
+                });
+            },
         },
     }
 </script>
