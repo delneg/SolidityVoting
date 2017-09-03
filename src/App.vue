@@ -8,9 +8,9 @@
             <h2 v-if="voted">Вы уже голосовали</h2>
             <div v-else>
                 <h2>Проголосовать</h2>
-                <button v-on:click="voteDenis">denis</button>
-                <button v-on:click="voteValera">valera</button>
-                <button v-on:click="voteOleg">oleg</button>
+                <div v-for="(item, index) in proposals">
+                    <button v-on:click="voteForProposal(index)">{{ item.name }}</button>
+                </div>
             </div>
         </div>
         <div v-else>
@@ -59,6 +59,7 @@
                     window.contract_i.proposals(i, function (_, proposal) {
                         that.proposals.push({
                             name:hex2a(proposal[0]),
+                            hex: proposal[0],
                             count:proposal[1].c[0]
                         })
                     });
@@ -85,9 +86,6 @@
         computed: {
         },
         methods: {
-            sayHello: function () {
-                console.log('hello, World!');
-            },
             checkVoted: function (){
                 let this_address = web3.eth.defaultAccount;
                 let that = this;
@@ -95,36 +93,21 @@
                     that.voted = voter[1];
                 });
             },
-            voteDenis: function () {
+            voteForProposal: function(i){
                 window.contract_i.giveRightToVote(function(error, result){
                     if (error)
+                    {
                         console.error(error);
+                    }
+                    else {
+                        console.log(result);
+                    }
                 });
-                window.contract_i.vote(convertToHex("denis"), function(error, result){
+                window.contract_i.vote(this.proposals[i].hex, function(error, result){
                     if (error)
                         console.error(error);
                 });
-            },
-            voteValera: function () {
-                window.contract_i.giveRightToVote(function(error, result){
-                    if (error)
-                        console.error(error);
-                });
-                window.contract_i.vote(convertToHex("valera"), function(error, result){
-                    if (error)
-                        console.error(error);
-                });
-            },
-            voteOleg: function () {
-                window.contract_i.giveRightToVote(function(error, result){
-                    if (error)
-                        console.error(error);
-                });
-                window.contract_i.vote(convertToHex("oleg"), function(error, result){
-                    if (error)
-                        console.error(error);
-                });
-            },
+            }
         },
     }
 </script>
