@@ -65,6 +65,7 @@
                     });
                 }
                 this.checkVoted();
+                setInterval(this.checkVoted, 5000);
 
             } else {
                 // Warn the user that they need to get a web3 browser
